@@ -62,6 +62,7 @@ fun main() {
 }
 
 
+/*
 private fun createProducer(brokers: String): Producer<String, String> {
     val props = Properties()
     props["bootstrap.servers"] = brokers
@@ -69,4 +70,5 @@ private fun createProducer(brokers: String): Producer<String, String> {
     props["value.serializer"] = StringSerializer::class.java.canonicalName
     return KafkaProducer<String, String>(props)
 }
+*/
 
