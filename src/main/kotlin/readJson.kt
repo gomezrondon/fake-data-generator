@@ -14,7 +14,7 @@ fun main() {
 
 fun fakeDataToGenerate(): List<Field> {
     val gson = Gson()
-    val reader: Reader = Files.newBufferedReader(Paths.get("data.json"))
+    val reader: Reader = Files.newBufferedReader(Paths.get("userprofile.avro"))
     val map = gson.fromJson<Map<*, *>>(reader, MutableMap::class.java)
 
     val fieldsMap = map.filterKeys { it!!.equals("fields") }
@@ -38,7 +38,7 @@ fun fakeDataToGenerate(): List<Field> {
         replace.removeAt(2)
         replace.removeAt(2)
 
-        var pro = Properties()
+        var pro = Properties2()
         replace.drop(2).forEachIndexed { index, word ->
             if (index == 0) {
                 pro.type = word.trim()
@@ -62,5 +62,6 @@ fun fakeDataToGenerate(): List<Field> {
 }
 
 
-data class Properties(var type:String="", var values:MutableList<String> = mutableListOf())
-data class Field(var name:String="",  var properties: Properties = Properties())
+data class Properties2(var type:String="", var values:MutableList<String> = mutableListOf())
+
+data class Field(var name:String="",  var properties: Properties2 = Properties2())

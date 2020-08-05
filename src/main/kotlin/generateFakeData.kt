@@ -1,11 +1,12 @@
 import java.util.*
 import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
+import kotlin.collections.ArrayList
 import kotlin.concurrent.timerTask
 
 fun main() {
 
-    val rnd = Random()
+
     val list = fakeDataToGenerate()
 
 
@@ -15,7 +16,7 @@ fun main() {
     var delay:Long = 2 //sec.
 
     for (i in start..1000_000 step step) {
-        var tempJson = generateRecord(list, rnd)
+        var tempJson = generateRecord(list)
         tempJson = tempJson.replace("##PLACE_HOLDER##", i.toString())
         println(tempJson)
         Thread.sleep(delay * 1000L)
@@ -26,7 +27,8 @@ fun main() {
 
 
 
-private fun generateRecord(list: List<Field>, rnd: Random): String {
+fun generateRecord(list: List<Field>): String {
+    val rnd = Random()
     var tempJson = " {  "
     list.forEachIndexed { index, it ->
         val isLastField = if (index + 1 == list.size) true else false
@@ -48,7 +50,7 @@ private fun generateRecord(list: List<Field>, rnd: Random): String {
     return tempJson
 }
 
-private fun getInterval(list: List<Field>): Pair<Int, Int> {
+fun getInterval(list: List<Field>): Pair<Int, Int> {
     var start = 0
     var step = 0
     val Iterations = list.filter { it.properties.type == "iteration" }.firstOrNull()

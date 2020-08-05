@@ -1,0 +1,12 @@
+
+
+#Crearing the stream from personsTopic topic
+create stream userprofile (userid INT, firstname VARCHAR, lastname VARCHAR, countrycode VARCHAR, rating DOUBLE) \
+with (KAFKA_TOPIC='personsTopic',VALUE_FORMAT='JSON');
+
+# revisamos el stream
+describe userprofile;
+
+# query el stream
+select firstname, lastname, countrycode, rating from userprofile emit changes;
+
