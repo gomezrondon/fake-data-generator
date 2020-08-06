@@ -1,10 +1,7 @@
 
-import com.fasterxml.jackson.databind.ObjectMapper
-import com.fasterxml.jackson.databind.SerializationFeature
-import com.fasterxml.jackson.databind.util.StdDateFormat
-import com.fasterxml.jackson.module.kotlin.registerKotlinModule
-import com.github.doyaaaaaken.kotlincsv.dsl.csvReader
 
+
+import com.github.doyaaaaaken.kotlincsv.dsl.csvReader
 import org.apache.kafka.clients.producer.KafkaProducer
 import org.apache.kafka.clients.producer.Producer
 import org.apache.kafka.clients.producer.ProducerRecord
@@ -20,13 +17,7 @@ fun main(arg: Array<String>) {
    var producer= createProducer("127.0.0.1:9092")
     val kafkaTopic = arg[0]   //personsTopic
 
-    val jsonMapper = ObjectMapper().apply {
-        registerKotlinModule()
-        disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
-        setDateFormat(StdDateFormat())
-    }
-
-    val list = fakeDataToGenerate()
+    val list = fakeDataToGenerate2()
 
     var pair = getInterval(list)
     var start = pair.first

@@ -1,65 +1,59 @@
 import com.google.gson.Gson
-import java.io.Reader
-import java.nio.file.Files
-import java.nio.file.Paths
+import com.jayway.jsonpath.JsonPath
+import net.minidev.json.JSONArray
+import java.io.File
+
 
 
 //https://attacomsian.com/blog/gson-read-json-file
 fun main() {
-
+    fakeDataToGenerate2()
 
 
 }
-
-
-fun fakeDataToGenerate(): List<Field> {
+//http://jsonpath.herokuapp.com/?path=$..*
+fun fakeDataToGenerate2(): List<Field> {
     val gson = Gson()
-    val reader: Reader = Files.newBufferedReader(Paths.get("userprofile.avro"))
-    val map = gson.fromJson<Map<*, *>>(reader, MutableMap::class.java)
+    val list2: MutableList<Field> = mutableListOf()
 
-    val fieldsMap = map.filterKeys { it!!.equals("fields") }
+    val tempSize:JSONArray =JsonPath.parse(File("userprofile.avro"))
+        .read("$..fields.size() ")
+    val size = getValueInt(tempSize)
 
-    val any:List<Any?>  = fieldsMap["fields"] as List<Any?>
+    for (i in 0 until size) {
+       // println(">>>>>>>>>>>>>>>>< $i")
+        val record:Any = JsonPath.parse(File("userprofile.avro"))
+            .read("$..fields.[$i]")
+        val toJson = gson.toJson(record)
 
-    val toList = any.map { record ->
-        //   println(record) //{name=userid, type={type=string, arg.properties={iteration={start=1000.0, step=1.0}}}}
+        val tempName:JSONArray = JsonPath.parse(toJson).read("$..name")
+        val name:String = getValueString(tempName)
+        val iteration: JSONArray = JsonPath.parse(toJson).read("$..iteration")
 
-        val replace = record.toString().replace("""\{|}""".toRegex(), " ")
-            .replace("[", " ")
-            .replace("]", " ")
-            .split(",")
-            .flatMap { it.split("*") }
-            .flatMap { it.split("=") }
-            .filter { it.isNotEmpty() }.toMutableList()
-        // .map { it.replace("="," ") }
-
-        replace.removeAt(2)
-        replace.removeAt(2)
-        replace.removeAt(2)
-        replace.removeAt(2)
-
-        var pro = Properties2()
-        replace.drop(2).forEachIndexed { index, word ->
-            if (index == 0) {
-                pro.type = word.trim()
-            } else {
-                pro.values.add(word.trim())
-            }
-
+        val field:Field =  if (iteration.isNotEmpty()) {
+            val start:JSONArray = JsonPath.parse(iteration).read("$..start")
+            val step:JSONArray = JsonPath.parse(iteration).read("$..step")
+            val list = mutableListOf(getValueInt(start).toString(), getValueInt(step).toString())
+            val prop = Properties2(type = "iteration", values =  list)
+            Field(name= name, properties = prop)
+        }else{
+            val options:JSONArray = JsonPath.parse(toJson).read("$..options")
+            val toList: MutableList<String> = options[0] as MutableList<String>
+            val prop = Properties2(type = "options" , values = toList )
+            Field(name= name, properties = prop)
         }
 
-        var record = Field()
-        replace.take(2).drop(1).forEach { record.name = it }
-        record.properties = pro
+        list2.add(field)
+    }
 
-        //  println(pro)
-        //println(record)
-        record
-    }.toList()
 
-    return toList
-
+    return list2
 }
+
+private fun getValueString(tempName: JSONArray) = tempName[0] as String
+
+private fun getValueInt(iteration: JSONArray) = iteration[0] as Int
+
 
 
 data class Properties2(var type:String="", var values:MutableList<String> = mutableListOf())
